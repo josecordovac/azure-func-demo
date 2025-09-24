@@ -10,36 +10,37 @@ on:
   workflow_dispatch:
 
 env:
-  AZURE_FUNCTIONAPP_NAME: demo-func-3456 # set this to your function app name on Azure
-  PACKAGE_DIRECTORY: '.' # set this to the directory which contains pom.xml file
-  JAVA_VERSION: '17' # set this to the java version to use
+  AZURE_FUNCTIONAPP_NAME: demo-func-3456   # nombre del Function App en Azure
+  PACKAGE_DIRECTORY: '.'                   # carpeta donde está el pom.xml
+  JAVA_VERSION: '17'                       # versión de Java
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-    
+
     steps:
-      - name: 'Checkout GitHub Action'
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Java Sdk ${{ env.JAVA_VERSION }}
-        uses: actions/setup-java@v1
-        with: |+
+      - name: Setup Java SDK ${{ env.JAVA_VERSION }}
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
           java-version: ${{ env.JAVA_VERSION }}
+          cache: maven
 
-      - name: 'Restore Project Dependencies Using Mvn'
-        shell: pwsh
-        run: |+
-          pushd './${{ env.PACKAGE_DIRECTORY }}'
-          mvn clean package
+      - name: Build with Maven
+        run: |
+          pushd "${{ env.PACKAGE_DIRECTORY }}"
+          mvn -B -ntp clean package
           popd
-      
-      - name: 'Run Azure Functions Action'
+
+      - name: Deploy to Azure Functions
         uses: Azure/functions-action@v1
         id: fa
         with:
-          app-name: 'demo-func-3456'
-          slot-name: 'Production'
-          package: '${{ env.PACKAGE_DIRECTORY }}'
+          app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
+          slot-name: Production
+          package: ${{ env.PACKAGE_DIRECTORY }}
           respect-pom-xml: true
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_76EB0F73C2DD4909ABC5C4FA5B51EE43 }}
