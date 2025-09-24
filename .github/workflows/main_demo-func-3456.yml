@@ -38,5 +38,5 @@ jobs:
           app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
           slot-name: Production
           # APUNTA al ZIP generado por el plugin de Azure Functions para Maven
-          package: target/azure-functions/${{ env.AZURE_FUNCTIONAPP_NAME }}.zip
+          package: target/azure-functions/${{ env.AZURE_FUNCTIONAPP_NAME }}
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_76EB0F73C2DD4909ABC5C4FA5B51EE43 }}
